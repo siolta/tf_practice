@@ -1,51 +1,51 @@
 provider "aws" {
-    region = "${var.region}"
-    profile = "${var.profile}"
+  region  = "${var.region}"
+  profile = "${var.profile}"
 }
 
 module "vpc" {
-    source = "./vpc"
-    name = "web"
-    cidr = "10.0.0.0/16"
-    public_subnet = "10.0.1.0/24"
+  source        = "./vpc"
+  name          = "web"
+  cidr          = "10.0.0.0/16"
+  public_subnet = "10.0.1.0/24"
 }
 
 resource "aws_instance" "web" {
-    ami = "${lookup(var.ami, var.region)}"  
-    instance_type = "${var.instance_type}"
-    key_name = "${var.key_name}"
-    subnet_id = "${module.vpc.public_subnet_id}"
-    private_ip = "${var.instance_ips[count.index]}"
-    associate_public_ip_address = true
-    user_data = "${file("files/web_bootstrap.sh")}"
+  ami                         = "${lookup(var.ami, var.region)}"
+  instance_type               = "${var.instance_type}"
+  key_name                    = "${var.key_name}"
+  subnet_id                   = "${module.vpc.public_subnet_id}"
+  private_ip                  = "${var.instance_ips[count.index]}"
+  associate_public_ip_address = true
+  user_data                   = "${file("files/web_bootstrap.sh")}"
 
-    vpc_security_group_ids = [
-        "${aws_security_group.web_host_sg.id}",
-    ]
+  vpc_security_group_ids = [
+    "${aws_security_group.web_host_sg.id}",
+  ]
 
-    tags = {
-        Name = "web-${format("%03d", count.index + 1)}"
-        Owner = "${element(var.owner_tag, count.index)}"
-    }
+  tags = {
+    Name  = "web-${format("%03d", count.index + 1)}"
+    Owner = "${element(var.owner_tag, count.index)}"
+  }
 
-    count = "${length(var.instance_ips)}"
+  count = "${length(var.instance_ips)}"
 }
 
 resource "aws_elb" "web" {
-    name = "web-elb"
+  name = "web-elb"
 
-    subnets = ["${module.vpc.public_subnet_id}"]
-    security_groups = ["${aws_security_group.web_inbound_sg.id}"]
+  subnets         = ["${module.vpc.public_subnet_id}"]
+  security_groups = ["${aws_security_group.web_inbound_sg.id}"]
 
-    listener = {
-        instance_port = 80
-        instance_protocol = "http"
-        lb_port = 80
-        lb_protocol = "http"
-    }
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
 
-    # The instances will be registered automagically
-    instances = ["${aws_instance.web.*.id}"]
+  # The instances will be registered automagically
+  instances = ["${aws_instance.web.*.id}"]
 }
 
 
