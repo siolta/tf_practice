@@ -45,7 +45,7 @@ resource "aws_elb" "web" {
   }
 
   # The instances will be registered automagically
-  instances = ["${aws_instance.web.*.id}"]
+  instances = aws_instance.web.*.id
 }
 
 
