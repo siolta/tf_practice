@@ -14,5 +14,5 @@ resource "aws_instance" "base" {
 }
 
 resource "aws_eip" "base" {
-    instance = "${aws_instance.base.id}"
+    instance = aws_instance.base.id
 }
