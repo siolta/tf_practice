@@ -1,6 +1,6 @@
 provider "aws" {
-  region  = "${var.region}"
-  profile = "${var.profile}"
+  region  = var.region
+  profile = var.profile
 }
 
 module "vpc" {
@@ -11,31 +11,31 @@ module "vpc" {
 }
 
 resource "aws_instance" "web" {
-  ami                         = "${lookup(var.ami, var.region)}"
-  instance_type               = "${var.instance_type}"
-  key_name                    = "${var.key_name}"
-  subnet_id                   = "${module.vpc.public_subnet_id}"
-  private_ip                  = "${var.instance_ips[count.index]}"
+  ami                         = lookup(var.ami, var.region)
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  subnet_id                   = module.vpc.public_subnet_id
+  private_ip                  = var.instance_ips[count.index]
   associate_public_ip_address = true
-  user_data                   = "${file("files/web_bootstrap.sh")}"
+  user_data                   = file("files/web_bootstrap.sh")
 
   vpc_security_group_ids = [
-    "${aws_security_group.web_host_sg.id}",
+    aws_security_group.web_host_sg.id,
   ]
 
   tags = {
     Name  = "web-${format("%03d", count.index + 1)}"
-    Owner = "${element(var.owner_tag, count.index)}"
+    Owner = element(var.owner_tag, count.index)
   }
 
-  count = "${length(var.instance_ips)}"
+  count = length(var.instance_ips)
 }
 
 resource "aws_elb" "web" {
   name = "web-elb"
 
-  subnets         = ["${module.vpc.public_subnet_id}"]
-  security_groups = ["${aws_security_group.web_inbound_sg.id}"]
+  subnets         = [module.vpc.public_subnet_id]
+  security_groups = [aws_security_group.web_inbound_sg.id]
 
   listener {
     instance_port     = 80
@@ -52,7 +52,7 @@ resource "aws_elb" "web" {
 resource "aws_security_group" "web_inbound_sg" {
   name        = "web_inbound"
   description = "Allow HTTP from Anywhere"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 80
@@ -79,7 +79,7 @@ resource "aws_security_group" "web_inbound_sg" {
 resource "aws_security_group" "web_host_sg" {
   name        = "web_host"
   description = "Allow SSH & HTTP to web hosts"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 22
@@ -93,7 +93,7 @@ resource "aws_security_group" "web_host_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${module.vpc.cidr}"]
+    cidr_blocks = [module.vpc.cidr]
   }
 
   egress {
