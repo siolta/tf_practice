@@ -3,13 +3,13 @@ multi line
 comment. */
 
 provider "aws" {
-    region     = "${var.region}"
-    profile    = "iolta"
+    region     = var.region
+    profile    = var.profile
 }
 
 # This is a single-line comment.
 resource "aws_instance" "base" {
-    ami           = "${lookup(var.ami, var.region)}"  
+    ami           = lookup(var.ami, var.region)
     instance_type = "t2.micro"
 }
 
