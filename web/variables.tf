@@ -13,6 +13,13 @@ variable "key_name" {
   description = "The AWS key pair to use for resources."
 }
 
+variable "key_path" {
+  type        = string
+  description = "The location of the SSH key to use for resources."
+  default     = "/Users/dg5h/.ssh/tfb_key.pem"
+}
+
+
 variable "ami" {
   type        = map(string)
   description = "A map of AMIs."
@@ -20,7 +27,7 @@ variable "ami" {
 }
 
 variable "instance_type" {
-  type = string
+  type        = string
   description = "The instance type."
   default     = "t2.micro"
 }
