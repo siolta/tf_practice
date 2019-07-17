@@ -4,12 +4,12 @@ provider "aws" {
   version = ">= 2.1.2"
 }
 
-data "template_file" "index" {
+data "template_file" "index_html" {
   count    = length(var.instance_ips)
   template = file("files/index.html.tpl")
 
   vars = {
-    hostname = "web-${format("03d", count.index + 1)}"
+    hostname = "web-${format("%03d", count.index + 1)}"
   }
 }
 
@@ -40,12 +40,14 @@ resource "aws_instance" "web" {
   count = length(var.instance_ips)
 
   connection {
+    type        = "ssh"
     user        = "ubuntu"
+    host        = self.public_ip
     private_key = file(var.key_path)
   }
 
   provisioner "file" {
-    content     = element(data.template_file.index.*.rendered, count.index)
+    content     = element(data.template_file.index_html[*].rendered, count.index)
     destination = "/tmp/index.html"
   }
 
@@ -74,7 +76,7 @@ resource "aws_elb" "web" {
   }
 
   # The instances will be registered automagically
-  instances = aws_instance.web.*.id
+  instances = aws_instance.web[*].id
 }
 
 
