@@ -6,9 +6,10 @@ provider "aws" {
 
 terraform {
   backend "s3" {
+    profile = "iolta"
+    region = "us-west-1"
     bucket = "tf-book-siolta-remote-state-web"
     key    = "terraform.tfstate"
-    region = var.region
   }
 }
 
