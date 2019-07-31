@@ -5,7 +5,7 @@ provider "aws" {
 }
 
 module "remote_state" {
-  source = "../../modules/remote_state"
-  prefix = var.prefix
+  source      = "../../modules/remote_state"
+  prefix      = var.prefix
   environment = var.environment
 }

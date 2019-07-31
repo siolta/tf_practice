@@ -4,6 +4,14 @@ provider "aws" {
   version = ">= 2.1.2"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "tf-book-siolta-remote-state-web"
+    key    = "terraform.tfstate"
+    region = var.region
+  }
+}
+
 data "template_file" "index_html" {
   count    = length(var.instance_ips)
   template = file("files/index.html.tpl")
