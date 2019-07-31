@@ -4,7 +4,7 @@ variable "region" {
 }
 
 variable "prefix" {
-  default = "TF-book-siolta"
+  default = "tf-book-siolta"
   description = "The name of our org, i.e. examplecom"
 }
 
