@@ -1,0 +1,7 @@
+profile        = "iolta"
+region         = "us-west-1"
+token          = "a9b435f5-0177-4a78-a9c7-8f5fe4ce49a1"
+encryption_key = "MjlhZDdiNmU4NGJh"
+environment    = "consul"
+vpc_cidr       = "10.0.0.0/16"
+public_subnet  = "10.0.5.0/24"
