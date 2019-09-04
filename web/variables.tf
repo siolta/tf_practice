@@ -43,3 +43,6 @@ variable "owner_tag" {
   default = ["team1", "team2"]
 }
 
+variable "token" {
+  description = "The Consul server token"
+}

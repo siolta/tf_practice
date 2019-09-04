@@ -4,12 +4,28 @@ provider "aws" {
   version = ">= 2.1.2"
 }
 
+provider "consul" {
+  address = "${data.terraform_remote_state.consul.consul_server.address.0}:8500"
+  datacenter = "consul"
+}
+
 terraform {
   backend "s3" {
     profile = "iolta"
     region = "us-west-1"
     bucket = "tf-book-siolta-remote-state-web"
     key    = "terraform.tfstate"
+  }
+}
+
+data "terraform_remote_state" "consul" {
+  backend = "s3"
+
+  config = {
+    profile = var.profile
+    region = var.region
+    bucket = "tf-book-siolta-remote-state-consul"
+    key = "terraform.tfstate"
   }
 }
 
@@ -27,6 +43,16 @@ module "vpc" {
   name          = "web"
   cidr          = "10.0.0.0/16"
   public_subnet = "10.0.1.0/24"
+}
+
+resource "consul_key_prefix" "web" {
+  token = var.token
+
+  path_prefix = "web/config/"
+
+  subkeys = {
+    "public_dns" = aws_elb.web.dns_name
+  }
 }
 
 resource "aws_instance" "web" {
