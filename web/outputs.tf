@@ -2,7 +2,7 @@ output "elb_address" {
   value = aws_elb.web.dns_name
 }
 
-output "addresses" {
+output "web_addresses" {
   value = aws_instance.web.*.public_ip
 }
 
