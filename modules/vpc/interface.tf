@@ -1,18 +1,18 @@
 variable "region" {
-  type = string
+  type        = string
   description = "The AWS region to launch the VPC in."
 }
 
 variable "environment" {
-  type = string
+  type        = string
   description = "The name of our environment, i.e. development."
-  default = "development"
+  default     = "development"
 }
 
 variable "key_name" {
-  type = string
+  type        = string
   description = "The AWS key pair to use for resources."
-  default = "tfb_key"
+  default     = "tfb_key"
 }
 
 variable "vpc_cidr" {
@@ -27,14 +27,14 @@ variable "public_subnets" {
 }
 
 variable "private_subnets" {
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
   description = "The private subnets to create."
 }
 
 variable "instance_type" {
-  type = string
-  default = "t2.micro"
+  type        = string
+  default     = "t2.micro"
   description = "The host instance type to launch."
 }
 
@@ -50,8 +50,8 @@ variable "ami" {
 }
 
 variable "bastion_instance_type" {
-  type = string
-  default = "t2.micro"
+  type        = string
+  default     = "t2.micro"
   description = "The bastion host instance type."
 }
 
@@ -79,9 +79,9 @@ variable "enable_dns_support" {
 }
 
 variable "map_public_ip_on_launch" {
-  type = bool
+  type        = bool
   description = "Should be false if you do not want to auto-assign public IP on launch"
-  default = true
+  default     = true
 }
 
 output "vpc_id" {
