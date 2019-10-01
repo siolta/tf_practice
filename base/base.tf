@@ -7,6 +7,15 @@ provider "aws" {
   profile = var.profile
 }
 
+terraform {
+  backend "s3" {
+    profile = "iolta"
+    region  = "us-west-1"
+    bucket  = "tf-book-siolta-remote-state-base"
+    key     = "terraform.tfstate"
+  }
+}
+
 data "terraform_remote_state" "web" {
   backend = "s3"
 
@@ -15,16 +24,6 @@ data "terraform_remote_state" "web" {
     region = var.region
     bucket = "tf-book-siolta-remote-state-web"
     key    = "terraform.tfstate"
-  }
-}
-
-
-terraform {
-  backend "s3" {
-    profile = "iolta"
-    region  = "us-west-1"
-    bucket  = "tf-book-siolta-remote-state-base"
-    key     = "terraform.tfstate"
   }
 }
 
