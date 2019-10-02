@@ -9,11 +9,13 @@ variable "region" {
 }
 
 variable "prefix" {
+  type = string
   default     = "tf-book-siolta"
   description = "The name of our org, i.e. examplecom"
 }
 
 variable "environment" {
+  type = string
   default     = "consul"
   description = "The name of our environment, i.e. development."
 }
@@ -31,17 +33,21 @@ variable "key_name" {
 }
 
 variable "vpc_cidr" {
+  type = string
   description = "The CIDR of the VPC."
 }
 
 variable "public_subnet" {
+  type = string
   description = "The public subnet to populate."
 }
 
 variable "token" {
+  type = string
   description = "Consul server token"
 }
 
 variable "encryption_key" {
+  type = string
   description = "Consul encryption key"
 }

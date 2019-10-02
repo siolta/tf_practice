@@ -13,7 +13,7 @@ terraform {
 }
 
 module "vpc_basic" {
-  source        = "../modules/vpc"
+  source        = "github.com/turnbullpress/tf_vpc_basic.git?ref=v0.0.1"
   name          = "consul"
   cidr          = var.vpc_cidr
   public_subnet = var.public_subnet
