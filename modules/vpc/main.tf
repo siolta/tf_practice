@@ -34,14 +34,14 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "public_internet_gateway" {
-  route_table_id         = aws_route_table.environment.public.id
+  route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.environment.id
 }
 
 resource "aws_route" "private_nate_gateway" {
   count                  = length(var.private_subnets)
-  route_table_id         = aws_route_table.environment.private[count.index].id
+  route_table_id         = aws_route_table.private[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_nat_gateway.environment[count.index].id
 }
