@@ -3,7 +3,6 @@ variable "profile" {
   description = "The AWS creds profile to use"
 }
 
-
 variable "region" {
   type        = string
   description = "The AWS Region."
