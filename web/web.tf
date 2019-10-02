@@ -5,16 +5,16 @@ provider "aws" {
 }
 
 provider "consul" {
-  address = "${data.terraform_remote_state.consul.consul_server.address.0}:8500"
+  address    = "${data.terraform_remote_state.consul.consul_server.address.0}:8500"
   datacenter = "consul"
 }
 
 terraform {
   backend "s3" {
     profile = "iolta"
-    region = "us-west-1"
-    bucket = "tf-book-siolta-remote-state-web"
-    key    = "terraform.tfstate"
+    region  = "us-west-1"
+    bucket  = "tf-book-siolta-remote-state-web"
+    key     = "terraform.tfstate"
   }
 }
 
@@ -23,9 +23,9 @@ data "terraform_remote_state" "consul" {
 
   config = {
     profile = var.profile
-    region = var.region
-    bucket = "tf-book-siolta-remote-state-consul"
-    key = "terraform.tfstate"
+    region  = var.region
+    bucket  = "tf-book-siolta-remote-state-consul"
+    key     = "terraform.tfstate"
   }
 }
 
@@ -38,8 +38,8 @@ data "template_file" "index_html" {
   }
 }
 
-module "vpc" {
-  source        = "../modules/vpc"
+module "vpc_basic" {
+  source        = "github.com/turnbullpress/tf_vpc_basic.git?ref=v0.0.1"
   name          = "web"
   cidr          = "10.0.0.0/16"
   public_subnet = "10.0.1.0/24"
@@ -59,8 +59,9 @@ resource "aws_instance" "web" {
   ami                         = lookup(var.ami, var.region)
   instance_type               = var.instance_type
   key_name                    = var.key_name
-  subnet_id                   = module.vpc.public_subnet_id
+  subnet_id                   = module.vpc_basic.public_subnet_id
   private_ip                  = var.instance_ips[count.index]
+  user_data                   = file("files/web_bootstrap.sh")
   associate_public_ip_address = true
 
   vpc_security_group_ids = [
@@ -69,7 +70,7 @@ resource "aws_instance" "web" {
 
   tags = {
     Name  = "web-${format("%03d", count.index + 1)}"
-    Owner = element(var.owner_tag, count.index)
+    Owner = var.owner_tag[count.index]
   }
 
   count = length(var.instance_ips)
@@ -100,7 +101,7 @@ resource "aws_instance" "web" {
 resource "aws_elb" "web" {
   name = "web-elb"
 
-  subnets         = [module.vpc.public_subnet_id]
+  subnets         = [module.vpc_basic.public_subnet_id]
   security_groups = [aws_security_group.web_inbound_sg.id]
 
   listener {
@@ -111,14 +112,13 @@ resource "aws_elb" "web" {
   }
 
   # The instances will be registered automagically
-  instances = aws_instance.web[*].id
+  instances = [aws_instance.web.*.id]
 }
-
 
 resource "aws_security_group" "web_inbound_sg" {
   name        = "web_inbound"
   description = "Allow HTTP from Anywhere"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = module.vpc_basic.vpc_id
 
   ingress {
     from_port   = 80
@@ -145,7 +145,7 @@ resource "aws_security_group" "web_inbound_sg" {
 resource "aws_security_group" "web_host_sg" {
   name        = "web_host"
   description = "Allow SSH & HTTP to web hosts"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = module.vpc_basic.vpc_id
 
   ingress {
     from_port   = 22
@@ -159,7 +159,7 @@ resource "aws_security_group" "web_host_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [module.vpc.cidr]
+    cidr_blocks = [module.vpc_basic.cidr]
   }
 
   egress {

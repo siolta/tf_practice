@@ -8,18 +8,6 @@ variable "region" {
   description = "The AWS Region to run in."
 }
 
-variable "key_name" {
-  type        = string
-  description = "The AWS key pair to use for resources."
-}
-
-variable "key_path" {
-  type        = string
-  description = "The location of the SSH key to use for resources."
-  default     = "/Users/dg5h/.ssh/tfb_key.pem"
-}
-
-
 variable "ami" {
   type        = map(string)
   description = "A map of AMIs."
@@ -32,10 +20,27 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
+variable "key_name" {
+  type        = string
+  description = "The AWS key pair to use for resources."
+}
+
 variable "instance_ips" {
   type        = list(string)
   description = "The IPs to use for our instances"
   default     = ["10.0.1.20", "10.0.1.21"]
+}
+
+variable "prefix" {
+  type = string
+  default     = "tf-book-siolta"
+  description = "The name of our org, i.e. examplecom"
+}
+
+variable "key_path" {
+  type        = string
+  description = "The location of the SSH key to use for resources."
+  default     = "/Users/dg5h/.ssh/tfb_key.pem"
 }
 
 variable "owner_tag" {
